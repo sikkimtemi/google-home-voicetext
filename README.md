@@ -105,8 +105,7 @@ DockerやRaspberry Piで`google-home-voicetext`を動かす場合は`node_module
 以下のコマンドを実施すると自動で修正が行われます。
 
 ```bash
-$ cd mdns_patch
-$ sh patch.sh
+$ patch -u node_modules/mdns/lib/browser.js < mdns_patch/browser.js.patch
 ```
 
 ## Google HomeのIPアドレスを指定する
