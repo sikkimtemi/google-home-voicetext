@@ -19,11 +19,13 @@ if (process.env['WIRELESS_IP']) {
     })
 }
 
-var VOICETEXT_API_KEY = process.env['VOICETEXT_API_KEY']
+const FILE_SERVER_PORT = '8888'
+const VOICETEXT_API_KEY = process.env['VOICETEXT_API_KEY']
+
 var VoiceText = require('voicetext')
 var voice = new VoiceText(VOICETEXT_API_KEY)
-var OUT_PATH = __dirname + '/../../public/voice/_temp.wav'
-var OUTPUT_URL = 'http://' + WIRELESS_IP + ':8888/googlehome/_temp.wav'
+var OUT_PATH = __dirname + '/public/voice/_temp.wav'
+var OUTPUT_URL = 'http://' + WIRELESS_IP + ':' + FILE_SERVER_PORT + '/googlehome/_temp.wav'
 var fs = require('fs')
 
 class VoiceTextWriter {

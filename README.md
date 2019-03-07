@@ -1,17 +1,26 @@
-# googlehome
-Google Homeに任意の言葉を喋らせる仕組みです。
+# google-home-voicetext
+Google Homeに任意の音声を喋らせる仕組みです。
+
+google-home-notifierをベースに、音声合成部分をVoiceTextに置き換えました。
 
 # 事前準備
 ## VoiceTextのAPIキーを取得する
-音声合成にVoiceTextを利用しているため、APIキーが必要となります。
-
-無料利用登録を行ってAPIキーを取得してください。
+以下のページで無料利用登録を行ってAPIキーを取得してください。
 
 https://cloud.voicetext.jp/webapi
 
 取得したAPIキーは環境変数 `VOICETEXT_API_KEY` に設定してください。
 
+```bash
+$ export VOICETEXT_API_KEY={取得したAPIキー}
+```
+
 ## サーバーのIPアドレスを確認する
+`google-home-voicetext`は音声ファイルをホストし、そのURLをGoogle Homeにキャストすることで音声を再生しています。
+
+Google Homeがアクセス可能なURLを生成するため、`google-home-voicetext`が稼働しているサーバーのIPアドレスを設定する必要があります。
+
+`check-ip-addr.js`を実行すると、通信モジュール名とIPアドレスが表示されます。
 
 ```bash
 $ node check-ip-addr.js
@@ -23,27 +32,86 @@ en3
 192.168.0.17
 ```
 
-Google Homeからアクセス可能なIPアドレスを環境変数 `WIRELES_IP` に設定してください。
-固定IPでない場合は通信モジュール名（`en0`など）を環境変数 `WIRELES_MODULE_NAME` に設定してください。
+Google Homeからアクセス可能なIPアドレスを選んで環境変数 `WIRELESS_IP` に設定してください。
+
+```bash
+$ export WIRELESS_IP=192.168.20.140
+```
+
+もしIPアドレスが頻繁に変動する場合は、通信モジュール名（`en0`など）を環境変数 `WIRELESS_MODULE_NAME` に設定してください。
+
+```bash
+$ export WIRELESS_MODULE_NAME=en0
+```
+
+## FirebaseのAPIキー等を取得する
+この作業は任意です。インターネット側からGoogle Homeを喋らせたい場合のみ実施してください。
+
+Firebaseのコンソールで`ウェブアプリにFirebaseを追加`を表示し、以下の値を環境変数に設定してください。
+
+| 環境変数 | 値 |
+|:-----------|:------------|
+| `FIREBASE_API_KEY` | `apiKey`の値 |
+| `FIREBASE_AUTH_DOMAIN` | `authDomain`の値 |
+| `FIREBASE_DB_URL` | `databaseURL`の値 |
+| `FIREBASE_PROJECT_ID` | `projectId`の値 |
+| `FIREBASE_STORAGE_BUCKET` | `storageBucket`の値 |
+| `FIREBASE_SENDER_ID` | `messagingSenderId`の値 |
 
 # 使い方
 
+## インストール
 ```bash
 $ git clone https://github.com/sikkimtemi/googlehome.git
 $ cd googlehome
-$ node file_server.js
+$ npm install
 ```
 
-file_serverは音声ファイルをホストしてGoogle Homeに渡すためのものです。デフォルトでは8888ポートを使用します。
-
+## file-server.js
 ```bash
-$ node api_server.js
+$ node file-server.js
 ```
 
-api_serverはPOSTを受信して、任意のテキストをGoogle Homeに喋らせるためのものです。デフォルトでは8080ポートを使用します。
+`file-server.js`は音声ファイルをホストしてGoogle Homeがアクセスできるようにします。デフォルトでは8888ポートを使用します。
+
+## api-server.js
+```bash
+$ node api-server.js
+```
+
+`api-server.js`はPOSTを受信して、任意のテキストをGoogle Homeに喋らせます。デフォルトでは8080ポートを使用します。
 
 下記のように呼び出します。
 
 ```bash
 $ curl -X POST -d "text=こんにちは、Googleです。" http://{サーバーのIPアドレス}:8080/google-home-notifier
+```
+
+## firestore.js
+```bash
+$ node firestore.js
+```
+
+`firestore.js`はFirebaseのCloud Firestore上の`googlehome/chant/message`というフィールドを常時監視し、変更があったらその内容をGoogle Homeに喋らせて、フィールドをクリアします。
+
+つまり`googlehome/chant/message`にメッセージを書き込むとGoogle Homeにそのメッセージを喋らせることが出来ます。
+
+この仕組みは危険なので、よく分からない場合は使用しないでください。
+
+# トラブルシューティングガイド
+## mdns_patch
+DockerやRaspberry Piで`google-home-voicetext`を動かす場合は`node_modules/mdns/lib/browser.js`を修正する必要があります。
+
+以下のコマンドを実施すると自動で修正が行われます。
+
+```bash
+$ cd mdns_patch
+$ sh patch.sh
+```
+
+## Google HomeのIPアドレスを指定する
+`google-home-voicetext`がGoogle Homeを名前で見つけられない場合や複数のGoogle Homeを運用していて特定の機器だけを指定したい場合は、Google HomeのIPアドレスを直接指定することが出来ます。
+
+```bash
+$ export GOOGLE_HOME_IP={Google HomeのIPアドレス}
 ```

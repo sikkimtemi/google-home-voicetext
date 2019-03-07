@@ -8,9 +8,13 @@ const serverPort = 8080
 var deviceName = 'Google Home'
 googlehome.device(deviceName)
 
+if (process.env['GOOGLE_HOME_IP']) {
+  googlehome.ip(process.env['GOOGLE_HOME_IP'])
+}
+
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
-app.post('/google-home-notifier', urlencodedParser, function (req, res) {
+app.post('/google-home-voicetext', urlencodedParser, function (req, res) {
   now = new Date().toFormat("YYYY-MM-DD HH24:MI:SS")
   console.log(now)
   if (!req.body) return res.sendStatus(400)
@@ -34,7 +38,7 @@ app.post('/google-home-notifier', urlencodedParser, function (req, res) {
 
 app.listen(serverPort, function () {
   console.log('POST "text=Hello Google Home" to:')
-  console.log('    http://{Server IP address}:' + serverPort + '/google-home-notifier')
+  console.log('    http://{Server IP address}:' + serverPort + '/google-home-voicetext')
   console.log('example:')
-  console.log('curl -X POST -d "text=こんにちは、Googleです。" http://{Server IP address}:' + serverPort + '/google-home-notifier')
+  console.log('curl -X POST -d "text=こんにちは、Googleです。" http://{Server IP address}:' + serverPort + '/google-home-voicetext')
 })
