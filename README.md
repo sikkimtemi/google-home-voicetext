@@ -98,6 +98,18 @@ $ node firestore.js
 
 この仕組みは危険なので、よく分からない場合は使用しないでください。
 
+# その他の機能
+## 話者を変える
+デフォルトの話者は`HIKARI`という女性です。環境変数`VOICETEXT_SPEAKER`を設定すると以下の話者を選択することが出来ます。
+
+| `VOICETEXT_SPEAKER`の値 | 説明 |
+|:-----------|:------------|
+| `BEAR` | 凶暴なクマ |
+| `HARUKA` | `HIKARI`よりも落ち着いた女性の声 |
+| `SANTA` | 浮かれたサンタクロース |
+| `SHOW` | 「モヤモヤさまぁ～ず」のナレーター |
+| `TAKERU` | 落ち着いた男性の声 |
+
 # トラブルシューティングガイド
 ## mdns_patch
 DockerやRaspberry Piで`google-home-voicetext`を動かす場合は`node_modules/mdns/lib/browser.js`を修正する必要があります。
