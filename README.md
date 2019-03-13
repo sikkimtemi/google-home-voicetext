@@ -62,8 +62,8 @@ Firebaseのコンソールで`ウェブアプリにFirebaseを追加`を表示�
 
 ## インストール
 ```bash
-$ git clone https://github.com/sikkimtemi/googlehome.git
-$ cd googlehome
+$ git clone https://github.com/sikkimtemi/google-home-voicetext.git
+$ cd google-home-voicetext
 $ npm install
 ```
 
@@ -84,7 +84,7 @@ $ node api-server.js
 下記のように呼び出します。
 
 ```bash
-$ curl -X POST -d "text=こんにちは、Googleです。" http://{サーバーのIPアドレス}:8080/google-home-notifier
+$ curl -X POST -d "text=こんにちは、Googleです。" http://{サーバーのIPアドレス}:8080/google-home-voicetext
 ```
 
 ## firestore.js
@@ -96,7 +96,7 @@ $ node firestore.js
 
 つまり`googlehome/chant/message`にメッセージを書き込むとGoogle Homeにそのメッセージを喋らせることが出来ます。
 
-この仕組みは危険なので、よく分からない場合は使用しないでください。
+インターネット側からGoogle Homeを制御できるようになるため、この仕組みは危険を伴います。よく分からない場合は使用しないでください。
 
 # その他の機能
 ## 話者を変える
