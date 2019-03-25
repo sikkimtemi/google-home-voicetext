@@ -1,5 +1,5 @@
 require("date-utils");
-const firebase = require("firebase");
+// const firebase = require("firebase");
 const googlehome = require("./google-home-voicetext");
 
 const deviceName = "Google Home";
@@ -10,19 +10,16 @@ if (process.env["GOOGLE_HOME_IP"]) {
 }
 
 // Initialize Firebase
-const config = {
-  apiKey: process.env["FIREBASE_API_KEY"],
-  authDomain: process.env["FIREBASE_AUTH_DOMAIN"],
-  databaseURL: process.env["FIREBASE_DB_URL"],
-  projectId: process.env["FIREBASE_PROJECT_ID"],
-  storageBucket: process.env["FIREBASE_STORAGE_BUCKET"],
-  messagingSenderId: process.env["FIREBASE_SENDER_ID"]
-};
-firebase.initializeApp(config);
+const admin = require("firebase-admin");
+const serviceAccount = require(process.env["FIREBASE_SECRET_KEY_PATH"]);
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: process.env["FIREBASE_DATABASE_URL"]
+});
 
-const firestore = firebase.firestore();
+// Connect to Firestore
+const firestore = admin.firestore();
 const document = firestore.doc("/googlehome/chant");
-
 const observer = document.onSnapshot(
   docSnapshot => {
     const text = docSnapshot.get("message");
@@ -46,6 +43,7 @@ const observer = document.onSnapshot(
     }
   },
   err => {
-    console.log("Encountered error: ${err}");
+    console.log("Firestore error:", err);
+    console.log(document);
   }
 );

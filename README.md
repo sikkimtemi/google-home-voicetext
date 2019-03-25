@@ -44,19 +44,42 @@ $ export WIRELESS_IP=192.168.20.140
 $ export WIRELESS_MODULE_NAME=en0
 ```
 
-## FirebaseのAPIキー等を取得する
+## Firebaseの秘密鍵を取得する
 この作業は任意です。インターネット側からGoogle Homeを喋らせたい場合のみ実施してください。
 
-Firebaseのコンソールで`ウェブアプリにFirebaseを追加`を表示し、以下の値を環境変数に設定してください。
+Firebaseのコンソールで`設定（歯車アイコン）->プロジェクトの設定->サービスアカウント`を表示し、`新しい秘密鍵の生成`をクリックしてください。
 
-| 環境変数 | 値 |
-|:-----------|:------------|
-| `FIREBASE_API_KEY` | `apiKey`の値 |
-| `FIREBASE_AUTH_DOMAIN` | `authDomain`の値 |
-| `FIREBASE_DB_URL` | `databaseURL`の値 |
-| `FIREBASE_PROJECT_ID` | `projectId`の値 |
-| `FIREBASE_STORAGE_BUCKET` | `storageBucket`の値 |
-| `FIREBASE_SENDER_ID` | `messagingSenderId`の値 |
+ダウンロードされたJSONファイルを適当なディレクトリに配置し、ファイルパスを環境変数 `FIREBASE_SECRET_KEY_PATH` に設定してください。
+
+```bash
+$ export FIREBASE_SECRET_KEY_PATH={JSONファイルのファイルパス}
+```
+
+更に同じページの`Admin SDK 構成スニペット`内に表示された`databaseURL`の値を環境変数 `FIREBASE_DATABASE_URL` に設定してください。
+
+```bash
+$ export FIREBASE_DATABASE_URL={`databaseURL`の値}
+```
+
+Cloud Firestoreで`コレクションを追加`をクリックし、以下の設定で保存してください。
+
+| 項目 | 値 |
+| -------- | -------- |
+| コレクションID | `googlehome` |
+| ドキュメントID | `chant` |
+| フィールド | `message` |
+
+セキュリティルールはロックモードにしてください。
+
+```Javascript
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+```
 
 # 使い方
 
@@ -92,15 +115,15 @@ $ curl -X POST -d "text=こんにちは、Googleです。" http://{サーバー�
 $ node firestore.js
 ```
 
-`firestore.js`はFirebaseのCloud Firestore上の`googlehome/chant/message`というフィールドを常時監視し、変更があったらその内容をGoogle Homeに喋らせて、フィールドをクリアします。
+`firestore.js`はFirebaseのCloud Firestore上の`googlehome/chant/message`というフィールドを常時監視します。
 
-つまり`googlehome/chant/message`にメッセージを書き込むとGoogle Homeにそのメッセージを喋らせることが出来ます。
+`googlehome/chant/message`にメッセージが書き込まれると`firestore.js`はGoogle Homeにそのメッセージを喋らせた後、メッセージを削除します。
 
-インターネット側からGoogle Homeを制御できるようになるため、この仕組みは危険を伴います。よく分からない場合は使用しないでください。
+安全のため、Firestoreのセキュリティルールはロックモードで運用することを推奨します。
 
 # その他の機能
 ## 話者を変える
-デフォルトの話者は`HIKARI`という女性です。環境変数`VOICETEXT_SPEAKER`を設定すると以下の話者を選択することが出来ます。
+デフォルトの話者は`HIKARI`という女性です。環境変数 `VOICETEXT_SPEAKER` を設定すると話者を変更することが出来ます。話者は以下の中から選択することが出来ます。
 
 | `VOICETEXT_SPEAKER`の値 | 説明 |
 |:-----------|:------------|
