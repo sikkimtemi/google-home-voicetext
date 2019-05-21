@@ -3,6 +3,12 @@ Google Homeに任意の音声を喋らせる仕組みです。
 
 google-home-notifierをベースに、音声合成部分をVoiceTextに置き換えました。
 
+Node.jsバージョン11で動作確認を行っています。
+
+google-home-voicetextが動くDocker環境は以下のURLを参照してください。
+
+https://github.com/sikkimtemi/google-home-voicetext-docker
+
 # 事前準備
 ## VoiceTextのAPIキーを取得する
 以下のページで無料利用登録を行ってAPIキーを取得してください。
